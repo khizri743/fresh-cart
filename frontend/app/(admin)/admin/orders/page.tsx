@@ -1,8 +1,12 @@
 import React from 'react';
 import OrdersToolbar from '../../../components/Admin/Orders/OrdersToolbar';
 import OrdersTable from '../../../components/Admin/Orders/OrdersTable';
+import { getOrders } from '@/server/order'; // Import Server Action
 
-const OrdersPage = () => {
+const OrdersPage = async () => {
+  // Fetch real data
+  const orders = await getOrders();
+
   return (
     <div className="w-full">
       {/* Header Section */}
@@ -24,8 +28,8 @@ const OrdersPage = () => {
       {/* Toolbar (Search & Filter) */}
       <OrdersToolbar />
 
-      {/* Main Table */}
-      <OrdersTable />
+      {/* Main Table with Real Data */}
+      <OrdersTable orders={orders} />
     </div>
   );
 };

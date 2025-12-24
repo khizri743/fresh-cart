@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -12,15 +13,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        // <--- THIS WAS EMPTY, IT NEEDS TO RETURN DATA
+        return ProductResource::collection(Product::all());
     }
 
     /**
@@ -28,38 +22,26 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'stock' => 'required|integer',
+            'status' => 'required|string',
+            'description' => 'nullable|string',
+            'slug' => 'required|string|unique:products,slug',
+            'image' => 'nullable|string'
+        ]);
+
+        $product = Product::create($validated);
+
+        return new ProductResource($product);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Product $product)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Product $product)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Product $product)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Product $product)
-    {
-        //
-    }
+    // Leave these empty if you aren't using them yet, 
+    // or delete them to keep the file clean.
+    public function create() {}
+    public function show(Product $product) {}
+    public function edit(Product $product) {}
+    public function update(Request $request, Product $product) {}
+    public function destroy(Product $product) {}
 }

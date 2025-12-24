@@ -1,8 +1,12 @@
 import React from 'react';
 import UsersToolbar from '../../../components/Admin/Users/UsersToolbar';
 import UsersTable from '../../../components/Admin/Users/UsersTable';
+import { getUsers } from '@/server/user'; // Import Server Action
 
-const UsersPage = () => {
+const UsersPage = async () => {
+  // Fetch real data from Laravel
+  const users = await getUsers();
+
   return (
     <div className="w-full">
       {/* Header Section */}
@@ -20,11 +24,11 @@ const UsersPage = () => {
         </button>
       </div>
 
-      {/* Toolbar (Search & Filter) */}
+      {/* Toolbar */}
       <UsersToolbar />
 
-      {/* Main Table */}
-      <UsersTable />
+      {/* Main Table with Real Data */}
+      <UsersTable users={users} />
     </div>
   );
 };

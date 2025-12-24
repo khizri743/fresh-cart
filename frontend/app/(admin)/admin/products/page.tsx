@@ -1,8 +1,14 @@
 import React from 'react';
 import ProductToolbar from '../../../components/Admin/Products/ProductToolbar';
 import ProductTable from '../../../components/Admin/Products/ProductTable';
+import AddProductModal from '../../../components/Admin/Products/AddProductModal'; // Import new component
+import { getProducts } from '@/server/product'; 
 
-const ProductsPage = () => {
+const ProductsPage = async () => {
+  
+  // 1. Fetch real data from Laravel
+  const products = await getProducts();
+
   return (
     <div className="w-full">
       {/* Header Section */}
@@ -11,19 +17,17 @@ const ProductsPage = () => {
           <h2 className="text-3xl font-bold text-slate-800">Products</h2>
           <p className="text-gray-500 mt-1">Manage your store inventory</p>
         </div>
-        <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg transition shadow-sm flex items-center justify-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Add New Product
-        </button>
+        
+        {/* Replace static button with the Modal Component */}
+        <AddProductModal />
+        
       </div>
 
-      {/* Toolbar (Search & Filter) */}
+      {/* Toolbar */}
       <ProductToolbar />
 
-      {/* Main Table */}
-      <ProductTable />
+      {/* Main Table with Real Data */}
+      <ProductTable products={products} />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\UserResource;
@@ -18,6 +19,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return new UserResource($request->user());
 });
+
+// This handles both GET (index) and POST (store)
+Route::apiResource('products', ProductController::class);
 
 // Users
 Route::get("/users", function () {
