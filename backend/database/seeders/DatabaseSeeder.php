@@ -1,25 +1,30 @@
 <?php
-
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Product;
+use App\Models\Order;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
+    
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Seed users first
+        User::factory()->count(50)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Then seed products
+        Product::factory()->count(100)->create();
+
+        // Finally, seed orders (which might relate to users/products)
+        Order::factory()->count(200)->create();
+
+        // Alternatively, use the call method for separate seeder classes:
+        // $this->call([
+        //     UserSeeder::class,
+        //     ProductSeeder::class,
+        //     OrderSeeder::class,
+        // ]);
     }
 }

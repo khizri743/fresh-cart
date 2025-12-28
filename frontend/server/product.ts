@@ -2,9 +2,41 @@
 
 import { revalidatePath } from "next/cache";
 
+// export interface Product {
+//     id: number;
+//     name: string;
+//     description: string;
+//     price: number;
+//     stock: number;
+//     status: string;
+//     image: string;
+//     created_at: string;
+// }
+
+// const baseUrl = process.env.APP_URL || 'http://127.0.0.1:8000/api';
+
+// export async function getProducts(): Promise<Product[]> {
+//     try {
+//         const response = await fetch(`${baseUrl}/products`, { cache: 'no-store' });
+//         if (!response.ok) throw new Error('Failed to fetch products');
+//         const data = await response.json();
+//         return data.data || data;
+//     } catch (error) {
+//         console.error("Product fetch error:", error);
+//         return [];
+//     }
+// }
+
+
+
+
+
+// ... imports and interface ...
+
 export interface Product {
     id: number;
     name: string;
+    category: string; // <--- Add this to interface
     description: string;
     price: number;
     stock: number;
@@ -15,10 +47,20 @@ export interface Product {
 
 const baseUrl = process.env.APP_URL || 'http://127.0.0.1:8000/api';
 
-export async function getProducts(): Promise<Product[]> {
+// Accept an optional category parameter
+export async function getProducts(category?: string): Promise<Product[]> {
     try {
-        const response = await fetch(`${baseUrl}/products`, { cache: 'no-store' });
+        let url = `${baseUrl}/products`;
+        
+        // Append query param if category exists
+        if (category) {
+            url += `?category=${encodeURIComponent(category)}`;
+        }
+
+        const response = await fetch(url, { cache: 'no-store' });
+        
         if (!response.ok) throw new Error('Failed to fetch products');
+        
         const data = await response.json();
         return data.data || data;
     } catch (error) {
@@ -26,6 +68,9 @@ export async function getProducts(): Promise<Product[]> {
         return [];
     }
 }
+// ... rest of file (createProduct) ...
+
+
 
 // NEW: Action to Create Product
 export async function createProduct(formData: FormData) {

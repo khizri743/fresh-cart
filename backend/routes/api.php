@@ -20,7 +20,8 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return new UserResource($request->user());
 });
 
-// This handles both GET (index) and POST (store)
+// --- 2. PRODUCT ROUTES ---
+// This single line handles GET /products, POST /products, GET /products/{id}, etc.
 Route::apiResource('products', ProductController::class);
 
 // Users
@@ -28,10 +29,6 @@ Route::get("/users", function () {
     return UserResource::collection(User::all());
 });
 
-// Products
-Route::get("/products", function () {
-    return ProductResource::collection(Product::all());
-});
 
 // Orders (With relationship loaded)
 Route::get("/orders", function () {

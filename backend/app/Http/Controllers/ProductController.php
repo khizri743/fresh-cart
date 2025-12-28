@@ -11,12 +11,24 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // <--- THIS WAS EMPTY, IT NEEDS TO RETURN DATA
-        return ProductResource::collection(Product::all());
-    }
+        // Start a query builder
+        $query = Product::query();
 
+        // 1. Filter by Category if provided
+        if ($request->has('category') && $request->category != '') {
+            $query->where('category', $request->category);
+        }
+
+        // 2. Optional: Filter by Search term (good to have)
+        if ($request->has('search') && $request->search != '') {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Return the filtered results
+        return ProductResource::collection($query->get());
+    }
     /**
      * Store a newly created resource in storage.
      */
