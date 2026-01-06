@@ -12,8 +12,20 @@ class UserResource extends JsonResource
      *
      * @return array<string, mixed>
      */
+    // public function toArray(Request $request): array
+    // {
+    //     return parent::toArray($request);
+    // }
+
     public function toArray(Request $request): array
-    {
-        return parent::toArray($request);
-    }
+{
+    return [
+        'id' => $this->id,
+        'name' => $this->name,
+        'email' => $this->email,
+        'role' => $this->role, // <--- CRITICAL: Make sure this is here
+        'created_at' => $this->created_at->format('Y-m-d'),
+        'email_verified_at' => $this->email_verified_at,
+    ];
+}
 }

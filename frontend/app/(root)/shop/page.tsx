@@ -2,22 +2,26 @@ import React from 'react';
 import { getProducts } from '@/server/product';
 import ProductCard from '@/app/components/User/ProductCard';
 
-// Next.js Pages receive searchParams prop automatically
+// Next.js 16 uses an asynchronous structure for props
 interface ShopPageProps {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function ShopPage({ searchParams }: ShopPageProps) {
+  // CRITICAL FIX: Await the searchParams Promise
+  const filters = await searchParams;
+
   // 1. Get category from URL (e.g. /shop?category=Dairy)
-  const category = typeof searchParams.category === 'string' ? searchParams.category : undefined;
+  const category =
+    typeof filters.category === 'string' ? filters.category : undefined;
 
   // 2. Fetch products filtered by category
+  // This now uses the actual 'category' value, e.g., "Meats"
   const products = await getProducts(category);
 
   return (
     <div className="bg-gray-50 min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         {/* Page Header */}
         <div className="mb-8 flex justify-between items-end">
           <div>
@@ -28,9 +32,13 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
               {products.length} result(s) found.
             </p>
           </div>
-          
+
           {category && (
-            <a href="/shop" className="text-sm text-green-600 hover:text-green-800 underline">
+            // A simple <a> tag is fine here for clearing filters
+            <a
+              href="/shop"
+              className="text-sm text-green-600 hover:text-green-800 underline"
+            >
               Clear Filter
             </a>
           )}
@@ -45,8 +53,12 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           </div>
         ) : (
           <div className="text-center py-20 bg-white rounded-lg shadow-sm">
-            <h3 className="text-lg font-medium text-gray-900">No products found.</h3>
-            <p className="text-gray-500 mt-2">Try selecting a different category.</p>
+            <h3 className="text-lg font-medium text-gray-900">
+              No products found.
+            </h3>
+            <p className="text-gray-500 mt-2">
+              Try selecting a different category.
+            </p>
           </div>
         )}
       </div>

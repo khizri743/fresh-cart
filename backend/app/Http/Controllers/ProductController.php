@@ -16,19 +16,26 @@ class ProductController extends Controller
         // Start a query builder
         $query = Product::query();
 
-        // 1. Filter by Category if provided
-        if ($request->has('category') && $request->category != '') {
-            $query->where('category', $request->category);
+        // 1. Filter by Category
+        // Note: Laravel automatically handles URL decoding for input values
+        if ($request->filled('category')) {
+            $query->where('category', $request->input('category'));
         }
 
-        // 2. Optional: Filter by Search term (good to have)
-        if ($request->has('search') && $request->search != '') {
-            $query->where('name', 'like', '%' . $request->search . '%');
+        // 2. Filter by Status (Added this)
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
         }
 
-        // Return the filtered results
-        return ProductResource::collection($query->get());
+        // 3. Filter by Search term
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->input('search') . '%');
+        }
+
+        // Return the filtered results, ordered by newest first
+        return ProductResource::collection($query->latest()->get());
     }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -36,6 +43,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'category' => 'required|string',
             'price' => 'required|numeric',
             'stock' => 'required|integer',
             'status' => 'required|string',
@@ -49,10 +57,16 @@ class ProductController extends Controller
         return new ProductResource($product);
     }
 
-    // Leave these empty if you aren't using them yet, 
-    // or delete them to keep the file clean.
+    /**
+     * Display the specified resource.
+     */
+    public function show(Product $product) 
+    {
+        return new ProductResource($product);
+    }
+
+    // Empty stubs for future implementation
     public function create() {}
-    public function show(Product $product) {}
     public function edit(Product $product) {}
     public function update(Request $request, Product $product) {}
     public function destroy(Product $product) {}

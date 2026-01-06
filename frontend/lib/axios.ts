@@ -6,6 +6,12 @@ const axiosInstance = axios.create({
         'X-Requested-With': 'XMLHttpRequest',
     },
     withCredentials: true, // This is critical for Sanctum Cookies
+    withXSRFToken: true,
 });
 
 export default axiosInstance;
+
+export const getOrders = () => {
+    const axios = require('axios');
+    return axios.get("/api/orders")
+}

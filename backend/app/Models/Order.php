@@ -11,12 +11,19 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'order_number',
-        'total_amount',
-        'payment_status', // paid, unpaid
-        'status',         // pending, delivered, etc.
-    ];
+    'user_id',
+    'customer_name',   // Added
+    'customer_email',  // Added
+    'shipping_address',// Added
+    'order_number',
+    'total_amount',
+    'status',
+    'payment_status'
+];
+
+protected $casts = [
+    'shipping_address' => 'array', // Automatically convert JSON to array
+];
 
     public function user(): BelongsTo
     {

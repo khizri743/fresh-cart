@@ -3,23 +3,36 @@ import axios from '@/lib/axios';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
+// 1. Define the interface for the Hook's parameters
+interface UseAuthProps {
+    middleware?: 'guest' | 'auth';
+    redirectIfAuthenticated?: string;
+}
+
+// 2. Define types for Login and Register arguments
+interface AuthActionProps {
+    setErrors: React.Dispatch<React.SetStateAction<any[]>>;
+    setStatus?: React.Dispatch<React.SetStateAction<any>>;
+    [key: string]: any; // Allows any other properties like email, password, etc.
+}
+
+export const useAuth = ({ middleware, redirectIfAuthenticated }: UseAuthProps = {}) => {
     const router = useRouter();
 
-    // 1. Fetch User Data (SWR handles caching and revalidation)
+    // Fetch User Data
     const { data: user, error, mutate } = useSWR('/api/user', () =>
-        axios.get('/api/user').then(res => res.data)
+        axios.get('/api/user').then(res => res.data.data || res.data)
         .catch(error => {
             if (error.response.status !== 409) throw error;
             router.push('/verify-email');
         })
     );
 
-    // 2. CSRF Token (Required by Laravel Sanctum)
+    // CSRF Token
     const csrf = () => axios.get('/sanctum/csrf-cookie');
 
-    // 3. Register Action
-    const register = async ({ setErrors, ...props }) => {
+    // Register Action
+    const register = async ({ setErrors, ...props }: AuthActionProps) => {
         await csrf();
         setErrors([]);
 
@@ -35,11 +48,11 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         }
     };
 
-    // 4. Login Action
-    const login = async ({ setErrors, setStatus, ...props }) => {
+    // Login Action
+    const login = async ({ setErrors, setStatus, ...props }: AuthActionProps) => {
         await csrf();
         setErrors([]);
-        setStatus(null);
+        if (setStatus) setStatus(null);
 
         try {
             await axios.post('/login', props);
@@ -53,7 +66,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         }
     };
 
-    // 5. Logout Action
+    // Logout Action
     const logout = async () => {
         if (!error) {
             await axios.post('/logout');
@@ -62,14 +75,14 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         window.location.pathname = '/login';
     };
 
-    // 6. Handle Redirects based on Auth State
+    // Handle Redirects
     useEffect(() => {
         if (middleware === 'guest' && redirectIfAuthenticated && user)
             router.push(redirectIfAuthenticated);
         if (window.location.pathname === '/verify-email' && user?.email_verified_at)
             router.push(redirectIfAuthenticated || '/');
         if (middleware === 'auth' && error) logout();
-    }, [user, error]);
+    }, [user, error, middleware, redirectIfAuthenticated, router]);
 
     return {
         user,
